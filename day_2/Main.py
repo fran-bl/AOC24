@@ -29,7 +29,6 @@ def part_2(data):
                     safe += 1
                     break
 
-
     return safe
 
 
