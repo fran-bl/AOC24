@@ -1,6 +1,6 @@
 # Advent of Code 2024
 
-Personal repo of AOC 2024 solutions.
+Personal repository of AOC 2024 solutions.
 
 Everything is written in **Python 3.12**.
 
