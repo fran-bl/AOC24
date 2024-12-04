@@ -1,3 +1,7 @@
+def check(mat, i, j, x, y):
+    return 1 if mat[i + 1 * x][j + 1 * y] == 'M' and mat[i + 2 * x][j + 2 * y] == 'A' and mat[i + 3 * x][j + 3 * y] == 'S' else 0
+
+
 def part_1(mat):
     count = 0
 
@@ -5,36 +9,28 @@ def part_1(mat):
         for j in range(len(mat[i])):
             if mat[i][j] == 'X':
                 if i >= 3:
-                    if mat[i - 1][j] == 'M' and mat[i - 2][j] == 'A' and mat[i - 3][j] == 'S':
-                        count += 1
+                    count += check(mat, i, j, -1, 0)
 
                     if j >= 3:
-                        if mat[i - 1][j - 1] == 'M' and mat[i - 2][j - 2] == 'A' and mat[i - 3][j - 3] == 'S':
-                            count += 1
+                        count += check(mat, i, j, -1, -1)
 
                     if j < len(mat[i]) - 3:
-                        if mat[i - 1][j + 1] == 'M' and mat[i - 2][j + 2] == 'A' and mat[i - 3][j + 3] == 'S':
-                            count += 1
+                        count += check(mat, i, j, -1, +1)
 
                 if i < len(mat) - 3:
-                    if mat[i + 1][j] == 'M' and mat[i + 2][j] == 'A' and mat[i + 3][j] == 'S':
-                        count += 1
+                    count += check(mat, i, j, +1, 0)
 
                     if j >= 3:
-                        if mat[i + 1][j - 1] == 'M' and mat[i + 2][j - 2] == 'A' and mat[i + 3][j - 3] == 'S':
-                            count += 1
+                        count += check(mat, i, j, +1, -1)
 
                     if j < len(mat[i]) - 3:
-                        if mat[i + 1][j + 1] == 'M' and mat[i + 2][j + 2] == 'A' and mat[i + 3][j + 3] == 'S':
-                            count += 1
+                        count += check(mat, i, j, +1, +1)
 
                 if j >= 3:
-                    if mat[i][j - 1] == 'M' and mat[i][j - 2] == 'A' and mat[i][j - 3] == 'S':
-                        count += 1
+                    count += check(mat, i, j, 0, -1)
                 
                 if j < len(mat[i]) - 3:
-                    if mat[i][j + 1] == 'M' and mat[i][j + 2] == 'A' and mat[i][j + 3] == 'S':
-                        count += 1
+                    count += check(mat, i, j, 0, +1)
 
     return count
 
