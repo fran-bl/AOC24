@@ -16,10 +16,10 @@ def part_1(data):
 def part_2(data):
     res = 0
 
-    valid_subs = re.finditer(r"(do\(\).*?|^.*?)don't\(\)", data)
+    valid_blocks = re.findall(r"(do\(\).*?|^.*?)don't\(\)", data)
 
-    for match in valid_subs:
-        res += part_1(match.group())
+    for block in valid_blocks:
+        res += part_1(block)
 
     return res
 
