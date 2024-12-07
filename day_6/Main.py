@@ -1,4 +1,5 @@
 import copy
+from tqdm import tqdm
 
 
 def get_start_pos(mat):
@@ -12,95 +13,87 @@ def get_start_pos(mat):
     return None
 
 
-def chk_good_path(mat):
-    pos = get_start_pos(mat)
+def get_obstacles(mat):
+    obstacles = {}
     height, width = len(mat), len(mat[0])
-
-    directions = {
-        0: [-1, 0],
-        1: [0, 1],
-        2: [1, 0],
-        3: [0, -1]
-    }
-    curr_dir = 0
-
-    turns_set = set()
-    turns = 0
-
-    while 0 <= pos[0] < height and 0 <= pos[1] < width: 
-        if pos[0] + directions[curr_dir][0] < 0 or pos[0] + directions[curr_dir][0] >= height or pos[1] + directions[curr_dir][1] < 0 or pos[1] + directions[curr_dir][1] >= width:
-            return True
-
-        if mat[pos[0] + directions[curr_dir][0]][pos[1] + directions[curr_dir][1]] == '#':
-            entry_dir = curr_dir
-            curr_dir = (curr_dir + 1) % 4
-
-            if 0 <= pos[0] + directions[curr_dir][0] < height and 0 <= pos[1] + directions[curr_dir][1] < width and mat[pos[0] + directions[curr_dir][0]][pos[1] + directions[curr_dir][1]] == '#':
-                curr_dir = (curr_dir + 1) % 4
-
-            turns_set.add(f'{pos[0]:03}{pos[1]:03}{entry_dir}{curr_dir}')
-            turns += 1
-            last_hit = (pos[0] + directions[curr_dir][0], pos[1] + directions[curr_dir][1])
-
-            if len(turns_set) != turns:
-                return False
-
-        pos[0] += directions[curr_dir][0]
-        pos[1] += directions[curr_dir][1]
-
-
-def part_1(mat):
-    count = 0
-
-    path = copy.deepcopy(mat)
-    start = get_start_pos(mat)
-    pos = get_start_pos(mat)
-    height, width = len(mat), len(mat[0])
-
-    directions = {
-        0: [-1, 0],
-        1: [0, 1],
-        2: [1, 0],
-        3: [0, -1]
-    }
-    curr_dir = 0
-
-    while 0 <= pos[0] < height and 0 <= pos[1] < width:
-        path[pos[0]][pos[1]] = 'X'
-        
-        if pos[0] + directions[curr_dir][0] < 0 or pos[0] + directions[curr_dir][0] >= height or pos[1] + directions[curr_dir][1] < 0 or pos[1] + directions[curr_dir][1] >= width:
-            break
-
-        if mat[pos[0] + directions[curr_dir][0]][pos[1] + directions[curr_dir][1]] == '#':
-            curr_dir = (curr_dir + 1) % 4
-
-        pos[0] += directions[curr_dir][0]
-        pos[1] += directions[curr_dir][1]
 
     for i in range(height):
         for j in range(width):
-            if path[i][j] == 'X':
-                count += 1
+            if mat[i][j] == '#':
+                obstacles[(i, j)] = True
 
-    return count, path
+    return obstacles
+
+
+def chk_good_path(obstacles, pos, height, width):
+    exit_dir = -1
+
+    turns_set = set()
+
+    while 0 <= pos[0] < height and 0 <= pos[1] < width: 
+        if pos[0] + int(exit_dir.real) < 0 or pos[0] + int(exit_dir.real) >= height or pos[1] + int(exit_dir.imag) < 0 or pos[1] + int(exit_dir.imag) >= width:
+            return True
+
+        if (pos[0] + int(exit_dir.real), pos[1] + int(exit_dir.imag)) in obstacles:
+            entry_dir = exit_dir
+            exit_dir *= -1j
+
+            if 0 <= pos[0] + int(exit_dir.real) < height and 0 <= pos[1] + int(exit_dir.imag) < width and (pos[0] + int(exit_dir.real), pos[1] + int(exit_dir.imag)) in obstacles:
+                exit_dir *= -1j
+
+            encoded_pos = f'{pos[0]:03}{pos[1]:03}{entry_dir}{exit_dir}'
+
+            if encoded_pos in turns_set:
+                return False
+            else:
+                turns_set.add(encoded_pos)
+
+        pos[0] += int(exit_dir.real)
+        pos[1] += int(exit_dir.imag)
+
+
+def part_1(mat):
+    path = set()
+    start = get_start_pos(mat)
+    pos = get_start_pos(mat)
+    obstacles = get_obstacles(mat)
+    height, width = len(mat), len(mat[0])
+
+    exit_dir = -1
+
+    while 0 <= pos[0] < height and 0 <= pos[1] < width:
+        path.add((pos[0], pos[1]))
+        
+        if pos[0] + int(exit_dir.real) < 0 or pos[0] + int(exit_dir.real) >= height or pos[1] + int(exit_dir.imag) < 0 or pos[1] + int(exit_dir.imag) >= width:
+            break
+
+        if (pos[0] + int(exit_dir.real), pos[1] + int(exit_dir.imag)) in obstacles:
+            exit_dir *= -1j
+
+        pos[0] += int(exit_dir.real)
+        pos[1] += int(exit_dir.imag)
+
+    return len(path), list(path)
 
 
 def part_2(mat):
     count = 0
 
     start = get_start_pos(mat)
+    obstacles = get_obstacles(mat)
     _, path = part_1(mat)
     height, width = len(mat), len(mat[0])
 
-    for i in range(height):
-        for j in range(width):
-            if path[i][j] == 'X' and (i, j) != (start[0], start[1]):
-                mat[i][j] = '#'
-                
-                if not chk_good_path(mat):
-                    count += 1
+    for i in tqdm(range(len(path)), desc='Computing...'):
+        idx = path[i]
+        
+        if idx != (start[0], start[1]):
+            obstacles[idx] = True
+            
+            if not chk_good_path(obstacles, start[:], height, width):
+                count += 1
 
-                mat[i][j] = '.'
+            obstacles.pop(idx, None)
 
     return count
 
