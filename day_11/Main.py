@@ -12,8 +12,7 @@ def compute(num, d, blink):
     elif len(str(num)) % 2 == 0:
         s_num = str(num)
         spl = len(s_num) // 2
-        count += compute(int(s_num[:spl]), d, blink - 1)
-        count += compute(int(s_num[spl:]), d, blink - 1)
+        count += compute(int(s_num[:spl]), d, blink - 1) + compute(int(s_num[spl:]), d, blink - 1)
     else:
         count += compute(num * 2024, d, blink - 1)
 
@@ -24,27 +23,17 @@ def compute(num, d, blink):
 
 def part_1(data):
     d = {}
-
-    count = 0
-    for num in data:
-        count += compute(num, d, 25)
-
-    return count
+    return sum(compute(n, d, 25) for n in data)
 
 
 def part_2(data):
     d = {}
-
-    count = 0
-    for num in data:
-        count += compute(num, d, 75)
-
-    return count
+    return sum(compute(n, d, 75) for n in data)
 
 
 def main():
     with open('in.txt') as file:
-        data = list(map(int, file.read().split()))
+        data = [int(n) for n in file.read().split()]
 
         print('Part 1:', part_1(data))
         print('Part 2:', part_2(data))
