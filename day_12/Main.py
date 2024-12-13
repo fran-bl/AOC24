@@ -1,40 +1,36 @@
-def flood_fill(start, plot, data, height, width, visited):
-    if data[start[0]][start[1]] != plot:
+def flood_fill(pos, p, m, h, w, v):
+    if m[pos[0]][pos[1]] != p:
         return [0, 1]
 
-    if start in visited:
+    if pos in v:
         return [0, 0]
 
     ret = [1, 0]
-    visited.add(start)
+    v.add(pos)
 
-    if start[0] - 1 >= 0:
-        res = flood_fill((start[0] - 1, start[1]), plot, data, height, width, visited)
-
+    if pos[0] - 1 >= 0:
+        res = flood_fill((pos[0] - 1, pos[1]), p, m, h, w, v)
         ret[0] += res[0]
         ret[1] += res[1]
     else:
         ret[1] += 1
 
-    if start[0] + 1 < height:
-        res = flood_fill((start[0] + 1, start[1]), plot, data, height, width, visited)
-
-        ret[0] += res[0]
-        ret[1] += res[1]
-    else:
-        ret[1] += 1
-    
-    if start[1] - 1 >= 0:
-        res = flood_fill((start[0], start[1] - 1), plot, data, height, width, visited)
-
+    if pos[0] + 1 < h:
+        res = flood_fill((pos[0] + 1, pos[1]), p, m, h, w, v)
         ret[0] += res[0]
         ret[1] += res[1]
     else:
         ret[1] += 1
     
-    if start[1] + 1 < width:
-        res = flood_fill((start[0], start[1] + 1), plot, data, height, width, visited)
-
+    if pos[1] - 1 >= 0:
+        res = flood_fill((pos[0], pos[1] - 1), p, m, h, w, v)
+        ret[0] += res[0]
+        ret[1] += res[1]
+    else:
+        ret[1] += 1
+    
+    if pos[1] + 1 < w:
+        res = flood_fill((pos[0], pos[1] + 1), p, m, h, w, v)
         ret[0] += res[0]
         ret[1] += res[1]
     else:
@@ -43,107 +39,95 @@ def flood_fill(start, plot, data, height, width, visited):
     return ret
 
 
-sides = 0
-def flood_fill2(start, plot, data, height, width, visited):
-    if data[start[0]][start[1]] != plot or start in visited:
-        return 0
+def flood_fill2(pos, p, m, h, w, v):
+    if m[pos[0]][pos[1]] != p or pos in v:
+        return [0, 0]
 
-    global sides
+    v.add(pos)
 
-    ret = 1
-    s = [0, 0, 0, 0]
-    visited.add(start)
+    area = 1
+    sides = 0
 
-    if start[0] - 1 >= 0:
-        if data[start[0] - 1][start[1]] != plot:
-            s[0] = 1
-
-        if start[1] - 1 >= 0:
-            if data[start[0] - 1][start[1] - 1] != plot and data[start[0] - 1][start[1]] == data[start[0]][start[1] - 1] == plot:
-                sides += 1
-
-        ret += flood_fill2((start[0] - 1, start[1]), plot, data, height, width, visited)
-    else:
-        s[0] = 1
-
-    if start[0] + 1 < height:
-        if data[start[0] + 1][start[1]] != plot:
-            s[2] = 1
-
-        if start[1] + 1 < width:
-            if data[start[0] + 1][start[1] + 1] != plot and data[start[0] + 1][start[1]] == data[start[0]][start[1] + 1] == plot:
-                sides += 1
-
-        ret += flood_fill2((start[0] + 1, start[1]), plot, data, height, width, visited)
-    else:
-        s[2] = 1
-    
-    if start[1] - 1 >= 0:
-        if data[start[0]][start[1] - 1] != plot:
-            s[3] = 1
-
-        if start[0] + 1 < height:
-            if data[start[0] + 1][start[1] - 1] != plot and data[start[0] + 1][start[1]] == data[start[0]][start[1] - 1] == plot:
-                sides += 1
-
-        ret += flood_fill2((start[0], start[1] - 1), plot, data, height, width, visited)
-    else:
-        s[3] = 1
-    
-    if start[1] + 1 < width:
-        if data[start[0]][start[1] + 1] != plot:
-            s[1] = 1
-
-        if start[0] - 1 >= 0:
-            if data[start[0] - 1][start[1] + 1] != plot and data[start[0] - 1][start[1]] == data[start[0]][start[1] + 1] == plot:
-                sides += 1
-
-        ret += flood_fill2((start[0], start[1] + 1), plot, data, height, width, visited)
-    else:
-        s[1] = 1
-
-    for i in range(4):
-        if s[i] == s[(i + 1) % 4] == 1:
+    if pos[0] - 1 < 0 or m[pos[0] - 1][pos[1]] != p:
+        if pos[1] - 1 < 0 or m[pos[0]][pos[1] - 1] != p:
             sides += 1
+    elif pos[1] - 1 >= 0 and m[pos[0]][pos[1] - 1] == p and m[pos[0] - 1][pos[1] - 1] != p:
+        sides += 1
+    
+    if pos[0] - 1 < 0 or m[pos[0] - 1][pos[1]] != p:
+        if pos[1] + 1 >= w or m[pos[0]][pos[1] + 1] != p:
+            sides += 1
+    elif pos[1] + 1 < w and m[pos[0]][pos[1] + 1] == p and m[pos[0] - 1][pos[1] + 1] != p:
+        sides += 1
+    
+    if pos[0] + 1 >= h or m[pos[0] + 1][pos[1]] != p:
+        if pos[1] + 1 >= w or m[pos[0]][pos[1] + 1] != p:
+            sides += 1
+    elif pos[1] + 1 < w and m[pos[0]][pos[1] + 1] == p and m[pos[0] + 1][pos[1] + 1] != p:
+        sides += 1
 
-    return ret
+    if pos[0] + 1 >= h or m[pos[0] + 1][pos[1]] != p:
+        if pos[1] - 1 < 0 or m[pos[0]][pos[1] - 1] != p:
+            sides += 1
+    elif pos[1] - 1 >= 0 and m[pos[0]][pos[1] - 1] == p and m[pos[0] + 1][pos[1] - 1] != p:
+        sides += 1
+
+    if pos[0] - 1 >= 0:
+        ret = flood_fill2((pos[0] - 1, pos[1]), p, m, h, w, v)
+        area += ret[0]
+        sides += ret[1]
+
+    if pos[0] + 1 < h:
+        ret = flood_fill2((pos[0] + 1, pos[1]), p, m, h, w, v)
+        area += ret[0]
+        sides += ret[1]
+    
+    if pos[1] - 1 >= 0:
+        ret = flood_fill2((pos[0], pos[1] - 1), p, m, h, w, v)
+        area += ret[0]
+        sides += ret[1]
+    
+    if pos[1] + 1 < w:
+        ret = flood_fill2((pos[0], pos[1] + 1), p, m, h, w, v)
+        area += ret[0]
+        sides += ret[1]
+
+    return [area, sides]
 
 
-def part_1(data, height, width):
+def part_1(m, h, w):
     res = 0
-    visited = set()
+    v = set()
 
-    for i in range(height):
-        for j in range(width):
-            if (i, j) not in visited:
-                l = flood_fill((i, j), data[i][j], data, height, width, visited)
-                res += l[0] * l[1]
+    for i in range(h):
+        for j in range(w):
+            if (i, j) not in v:
+                ans = flood_fill((i, j), m[i][j], m, h, w, v)
+                res += ans[0] * ans[1]
 
     return res
 
 
-def part_2(data, height, width):
+def part_2(m, h, w):
     res = 0
-    visited = set()
+    v = set()
 
-    global sides
-
-    for i in range(height):
-        for j in range(width):
-            if (i, j) not in visited:
-                sides = 0
-                res += flood_fill2((i, j), data[i][j], data, height, width, visited) * sides
+    for i in range(h):
+        for j in range(w):
+            if (i, j) not in v:
+                ans = flood_fill2((i, j), m[i][j], m, h, w, v)
+                res += ans[0] * ans[1]
 
     return res
 
 
 def main():
     with open('in.txt') as file:
-        data = [list(line.rstrip()) for line in file]
-        height, width = len(data), len(data[0])
+        m = [list(line.rstrip()) for line in file]
+        h, w = len(m), len(m[0])
 
-        print('Part 1:', part_1(data, height, width))
-        print('Part 2:', part_2(data, height, width))
+        print('Part 1:', part_1(m, h, w))
+        print('Part 2:', part_2(m, h, w))
 
 
 if __name__ == '__main__':
