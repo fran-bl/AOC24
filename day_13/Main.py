@@ -47,7 +47,7 @@ def part_2(d):
 
 def main():
 	with open('in.txt') as file:
-		d = [[list(map(int, re.findall(r'[0-9]+', s))) for s in line.split('\n')] for line in file.read().strip().split('\n\n')]
+		d = [[list(map(int, re.findall(r'[0-9]+', line))) for line in block.split('\n')] for block in file.read().strip().split('\n\n')]
 
 		print('Part 1:', part_1(d))
 		print('Part 2:', part_2(d))
