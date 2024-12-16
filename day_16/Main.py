@@ -1,55 +1,20 @@
 from queue import PriorityQueue
 
 
-def h(a, b):
-    return abs(a[0] - b[0]) + abs(a[1] - b[1])
-
-
 def adj(m, curr):
     d = curr[2]
 
     if (curr[0] + d[0], curr[1] + d[1]) in m:
         yield 1, (curr[0] + d[0], curr[1] + d[1], d)
 
-    yield 1000, (*curr[:2], (-d[1], d[0]))
-    yield 1000, (*curr[:2], (d[1], -d[0]))
+    if (curr[0] - d[1], curr[1] + d[0]) in m:
+        yield 1000, (*curr[:2], (-d[1], d[0]))
+    
+    if (curr[0] + d[1], curr[1] - d[0]) in m:
+        yield 1000, (*curr[:2], (d[1], -d[0]))
 
 
-def part_1(m, s, e):
-    dirs = [(-1, 0), (0, 1), (1, 0), (0, -1)]
-
-    g = {cell: float('inf') for cell in m.keys()}
-    g[s] = 0
-    f = {cell: float('inf') for cell in m.keys()}
-    f[s] = h(s, e)
-
-    op = PriorityQueue()
-    op.put((f[s], s, (0, 1)))
-
-    while not op.empty():
-        _, curr, p_dir = op.get()
-
-        for d in dirs:
-            if d == (-p_dir[0], -p_dir[1]):
-                continue
-
-            child = (curr[0] + d[0], curr[1] + d[1])
-
-            if child in m:
-                tg = g[curr] + 1 + (1000 if p_dir != d else 0)
-                tf = tg + h(child, e)
-
-                if tg < g[child]:
-                    g[child] = tg
-                    f[child] = tf
-                    op.put((tf, child, d))
-
-    return g[e]
-
-
-def part_2(m, s, e):
-    s = (*s, (0, 1))
-
+def dijkstra(m, s, e):
     d = {}
     d[s] = 0
 
@@ -69,15 +34,15 @@ def part_2(m, s, e):
             elif d_ad + dist == d[ad]:
                 paths[ad].append(curr)
 
-    minm = part_1(m, s, e)
-    direction = None
+    opt_dir = None
+    min_d = float('inf')
 
-    for i in [(-1, 0), (0, 1), (1, 0), (0, -1)]:
-        if d[(*e, i)] == minm:
-            direction = i
-            break
+    for direction in [(-1, 0), (1, 0), (0, 1), (0, -1)]:
+        if (*e, direction) in d and min_d > d[(*e, direction)]:
+            min_d = d[(*e, direction)]
+            opt_dir = direction
 
-    stack = [(*e, direction)]
+    stack = [(*e, opt_dir)]
     visited = set(stack)
 
     while len(stack) > 0:
@@ -89,7 +54,11 @@ def part_2(m, s, e):
 
     unique_cells = set(x[:2] for x in visited)
 
-    return len(unique_cells)
+    return d[(*e, opt_dir)], len(unique_cells)
+
+
+def solution(m, s, e):
+    return dijkstra(m, s, e)
 
 
 def main():
@@ -110,8 +79,9 @@ def main():
                 if c != '#':
                     m[(i, j)] = c
 
-        print('Part 1:', part_1(m, s, e))
-        print('Part 2:', part_2(m, s, e))
+        res = solution(m, (*s, (0, 1)), e)
+        print('Part 1:', res[0])
+        print('Part 2:', res[1])
 
 
 if __name__ == '__main__':
