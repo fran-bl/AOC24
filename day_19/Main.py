@@ -24,11 +24,11 @@ def part_1(dp, patterns, designs):
     return res
 
 
-def part_2(dp, patterns, designs):
+def part_2(dp, designs):
     res = 0
 
     for design in designs:
-        res += compute(dp, patterns, design)
+        res += dp[design]
 
     return res
 
@@ -42,7 +42,7 @@ def main():
         dp = {}
         
         print('Part 1:', part_1(dp, patterns, designs))
-        print('Part 1:', part_2(dp, patterns, designs))
+        print('Part 1:', part_2(dp, designs))
 
 
 if __name__ == '__main__':
