@@ -6,21 +6,18 @@ def heuristic(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
-def near_path(path, cell):
-    i, j = cell
+def skip(path, r):
+    count = 0
 
-    return (i + 1, j) in path or (i - 1, j) in path or (i, j + 1) in path or (i, j - 1) in path
+    for cell in path:
+        for di in range(-r, r + 1):
+            for dj in range(-r + abs(di), r + 1 - abs(di)):
+                hop = (cell[0] + di, cell[1] + dj)
+                if hop in path:
+                    if path[cell] - path[hop] - heuristic(cell, hop) >= 100:
+                        count += 1
 
-
-def skip(wall, path):
-    i, j = wall
-
-    if (i - 1, j) in path and (i + 1, j) in path:
-        return abs(path[(i - 1, j)] - path[(i + 1, j)]) - 2
-    elif (i, j - 1) in path and (i, j + 1) in path:
-        return abs(path[(i, j - 1)] - path[(i, j + 1)]) - 2
-
-    return 0
+    return count
 
 
 def a_star(cells, s, e):
@@ -67,28 +64,12 @@ def a_star(cells, s, e):
     return len(fwd), path
 
 
-def part_1(path, walls):
-    count = 0 
-
-    for wall in walls:
-        if skip(wall, path) >= 100:
-            count += 1
-
-    return count
+def part_1(path, r):
+    return skip(path, r)
 
 
-def part_2(path):
-    count = 0
-
-    for cell in path:
-        for di in range(-20, 21):
-            for dj in range(-20 + abs(di), 21 - abs(di)):
-                hop = (cell[0] + di, cell[1] + dj)
-                if hop in path:
-                    if path[cell] - path[hop] - heuristic(cell, hop) >= 100:
-                        count += 1
-
-    return count
+def part_2(path, r):
+    return skip(path, r)
 
 
 def main():
@@ -96,7 +77,7 @@ def main():
         data = file.readlines()
 
         n = len(data)
-        path, walls = {}, {}
+        path = {}
         s = e = None
 
         for i in range(n):
@@ -110,11 +91,6 @@ def main():
                 if data[i][j] == 'E':
                     e = (i, j)
 
-        for i in range(n):
-            for j in range(n):
-                if data[i][j] == '#' and 0 < i < n - 1 and 0 < j < n - 1 and near_path(path, (i, j)):
-                    walls[(i, j)] = True
-
         l, p = a_star(path, s, e)
 
         c = e
@@ -123,8 +99,8 @@ def main():
             l -= 1
             c = p[c]
 
-        print('Part 1:', part_1(path, walls))
-        print('Part 2:', part_2(path))
+        print('Part 1:', part_1(path, 2))
+        print('Part 2:', part_2(path, 20))
 
 
 if __name__ == '__main__':
