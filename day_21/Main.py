@@ -47,5 +47,6 @@ def main():
         print('Part 1:', part_1(keypad, dirpad, data))
         print('Part 1:', part_2(keypad, dirpad, data))
 
+
 if __name__ == '__main__':
     main()
