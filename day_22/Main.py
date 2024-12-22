@@ -1,87 +1,51 @@
-from collections import Counter
+def evolve(n, reps):
+    nums, changes, prices = [], [], []
 
+    for _ in range(reps):
+        t = n
+        n = ((n * 64) ^ n) % 16777216
+        n = ((n // 32) ^ n) % 16777216
+        n = ((n * 2048) ^ n) % 16777216
+        nums.append(n)
+        changes.append(n % 10 - t % 10)
+        prices.append(n % 10)
 
-def evolve(n):
-    n = ((n * 64) ^ n) % 16777216
-    n = ((n // 32) ^ n) % 16777216
-    n = ((n * 2048) ^ n) % 16777216
-
-    return n
-
-
-def common_seq(seqs):
-    dicts = []
-
-    for l in seqs:
-        d = {}
-
-        for i in range(len(l) - 3):
-            seq = tuple(l[i:i + 4])
-            
-            if seq not in d:
-                d[seq] = i
-
-        dicts.append(d)
-
-
-    all_keys = Counter(k for d in dicts for k in d.keys())
-
-    ranked = sorted(all_keys.items(), key=lambda item: item[1], reverse = True)
-
-    return ranked, dicts
+    return nums, changes, prices
 
 
 def part_1(nums):
     res = 0
 
     for num in nums:
-        for _ in range(2000):
-            num = evolve(num)
-
-        res += num
+        res += evolve(num, 2000)[0][-1]
 
     return res
 
 
 def part_2(nums):
-    seqs = []
-    prices = []
+    d = {}
 
     for num in nums:
-        ch = []
-        pr = []
+        seqs = set()
+        
+        _, ch, pr = evolve(num, 2000)
 
-        for _ in range(2000):
-            t = evolve(num)
-            ch.append(t % 10 - num % 10)
-            num = t
-            pr.append(num % 10)
-
-        seqs.append(ch)
-        prices.append(pr)
-
-    ranked, dicts = common_seq(seqs)
-
-    bananas = []
-
-    for k, c in ranked:
-        cnt = 0
-
-        for i, d in enumerate(dicts):
-            if k in d:
-                cnt += prices[i][d[k] + 3]
+        for i in range(len(ch) - 3):
+            seq = tuple(ch[i:i + 4])
             
-        bananas.append(cnt)
+            if seq not in seqs:
+                d[seq] = d.get(seq, 0) + pr[i + 3]
+                seqs.add(seq)
 
-    return max(bananas)
+    return max(d.values())
 
 
 def main():
     with open('in.txt') as file:
-        data = [int(num) for num in file.readlines()]
+        nums = [int(num) for num in file.readlines()]
         
-        print('Part 1:', part_1(data))
-        print('Part 1:', part_2(data))
+        print('Part 1:', part_1(nums))
+        print('Part 1:', part_2(nums))
 
 
 if __name__ == '__main__':
