@@ -45,7 +45,7 @@ def main():
         nums = [int(num) for num in file.readlines()]
         
         print('Part 1:', part_1(nums))
-        print('Part 1:', part_2(nums))
+        print('Part 2:', part_2(nums))
 
 
 if __name__ == '__main__':

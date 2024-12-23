@@ -42,7 +42,7 @@ def main():
         dp = {}
         
         print('Part 1:', part_1(dp, patterns, designs))
-        print('Part 1:', part_2(dp, designs))
+        print('Part 2:', part_2(dp, designs))
 
 
 if __name__ == '__main__':

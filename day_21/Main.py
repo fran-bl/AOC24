@@ -45,7 +45,7 @@ def main():
         dirpad = {c: (i % 3, i // 3) for i, c in enumerate(" ^A<v>")}
         
         print('Part 1:', part_1(keypad, dirpad, data))
-        print('Part 1:', part_2(keypad, dirpad, data))
+        print('Part 2:', part_2(keypad, dirpad, data))
 
 
 if __name__ == '__main__':
