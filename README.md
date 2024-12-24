@@ -29,5 +29,6 @@ Everything is written in **Python 3.12.3**.
 - [Day 21](day_21/Main.py): ⭐⭐
 - [Day 22](day_22/Main.py): ⭐⭐
 - [Day 23](day_23/Main.py): ⭐⭐
+- [Day 24](day_24/Main.py): ⭐⭐
 
 [License](LICENSE)
